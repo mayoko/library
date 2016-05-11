@@ -41,17 +41,37 @@ bool parallel(P p1, P p2, P q1, P q2) {
     return a.det(b) == 0;
 }
 
-// 直線p1-p2と直線q1-q2が平行な場合の,2つの直線の距離
-double dist(P p1, P p2, P q1, P q2) {
-    P p = p2-p1;
-    p = P(-p.y, p.x);
-    p.normalize();
-    return abs(p.dot(p1-q1));
-}
-
 // 直線p1-p2と直線q1-q2の交点
 P intersection(P p1, P p2, P q1, P q2) {
     return p1+(p2-p1)*((q2-q1).det(q1-p1)/(q2-q1).det(p2-p1));
+}
+inline Real square(Real x) {return x*x;}
+// 直線p1-p2と点qの距離
+Real dist(P p1, P p2, P q) {
+    q = q-p1;
+    p2 = p2-p1;
+    return sqrt((q.dot(q)*p2.dot(p2) - square(q.dot(p2))) / p2.dot(p2));
+}
+// 線分p1-p2と点qの距離
+Real distSeg(P p1, P p2, P q) {
+    Real d = (q-p1).dot(p2-p1) / p2.dist(p1);
+    if (d < 0) return q.dist(p1);
+    if (d > p2.dist(p1)) return q.dist(p2);
+    return dist(p1, p2, q);
+}
+
+// 線分p1-p2と線分q1-q2の距離
+Real distSeg(P p1, P p2, P q1, P q2) {
+    if (p1==p2 && q1==q2) return q1.dist(p1);
+    if (p1==p2) return distSeg(q1, q2, p1);
+    if (q1==q2) return distSeg(p1, p2, q1);
+    if (!parallel(p1, p2, q1, q2)) {
+        P r = intersection(p1, p2, q1, q2);
+        if (on_seg(p1, p2, r) && on_seg(q1, q2, r)) return 0;
+    }
+    Real ret = min(distSeg(p1, p2, q1), distSeg(p1, p2, q2));
+    ret = min(ret, min(distSeg(q1, q2, p1), distSeg(q1, q2, p2)));
+    return ret;
 }
 
 // 点 P が三角形の内部に存在するか
