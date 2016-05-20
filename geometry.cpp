@@ -1,25 +1,25 @@
-double eps = 1e-12;
+Real eps = 1e-12;
 
-double add(double a, double b) {
+Real add(Real a, Real b) {
     if (abs(a+b) < eps * (abs(a)+abs(b))) return 0;
     return a+b;
 }
 
-bool equal(double a, double b) {
+bool equal(Real a, Real b) {
     return add(a, -b) == 0;
 }
 
 struct P {
-    double x, y;
+    Real x, y;
     P() {}
-    P(double x, double y) : x(x), y(y) {}
+    P(Real x, Real y) : x(x), y(y) {}
     P operator+(P p) const {return P(add(x, p.x), add(y, p.y));}
     P operator-(P p) const {return P(add(x, -p.x), add(y, -p.y));}
-    P operator*(double d) const {return P(x*d, y*d);}
-    double dot(P p) const {return add(x*p.x, y*p.y);} // 内積
-    double det(P p) const {return add(x*p.y, -y*p.x);} // 外積
-    double dist(P p) const {return sqrt((x-p.x)*(x-p.x) + (y-p.y)*(y-p.y));} // 距離
-    void normalize() {double d = sqrt(x*x+y*y); x /= d; y /= d;} // 正規化
+    P operator*(Real d) const {return P(x*d, y*d);}
+    Real dot(P p) const {return add(x*p.x, y*p.y);} // 内積
+    Real det(P p) const {return add(x*p.y, -y*p.x);} // 外積
+    Real dist(P p) const {return sqrt((x-p.x)*(x-p.x) + (y-p.y)*(y-p.y));} // 距離
+    void normalize() {Real d = sqrt(x*x+y*y); x /= d; y /= d;} // 正規化
     bool operator<(const P& rhs) const {
         if (x != rhs.x) return x < rhs.x;
         return y < rhs.y;
@@ -82,16 +82,16 @@ bool inTri(P p, P a, P b, P c) {
     P ap = p-a;
     P bp = p-b;
     P cp = p-c;
-    double c1 = ab.det(bp);
-    double c2 = bc.det(cp);
-    double c3 = ca.det(ap);
+    Real c1 = ab.det(bp);
+    Real c2 = bc.det(cp);
+    Real c3 = ca.det(ap);
     if (c1 > 0 && c2 > 0 && c3 > 0) return true;
     if (c1 < 0 && c2 < 0 && c3 < 0) return true;
     return false;
 }
 
 // 三角形の符号付き面積
-double area(P p, P q, P r) {
+Real area(P p, P q, P r) {
     return (q-p).det(r-p)/2;
 }
 
@@ -116,11 +116,11 @@ vector<P> convex_hull(vector<P> ps) {
 }
 
 // ps からなる凸多角形の面積
-double convex_area(vector<P> ps) {
+Real convex_area(vector<P> ps) {
     ps = convex_hull(ps);
     int n = ps.size();
     if (n <= 2) return 0;
-    double ans = 0;
+    Real ans = 0;
     for (int i = 0; i < n; i++) {
         ans += ps[i].det(ps[(i+1)%n]);
     }
